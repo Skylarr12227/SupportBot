@@ -26,3 +26,6 @@ WOMBO Support Bot
 3. `python3.9 -m supportbot` (can be closed now)
 4. `tmux attach -t <number of session>` to log into the session
    
+# credit for help with code
+- Flame442 <3
+- Skylarr

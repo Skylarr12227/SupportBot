@@ -45,6 +45,7 @@ class BitlyCog(commands.Cog):
         """Affiliate leaderboard for WOMBO"""
         ctx = await self.bot.get_context(interaction)
         params = {'size': '10'}
+        params2 = {'units': '-1'}
         async with aiohttp.ClientSession() as session:
             async with session.get('https://api-ssl.bitly.com/v4/groups/BmbemxsY7AC/bitlinks',
                                    headers=self.headers,
@@ -52,19 +53,28 @@ class BitlyCog(commands.Cog):
                 if response.status == 200:
                     data = await response.json()
                     links = data['links']
-
+                    desc = ''
                     embed = discord.Embed(title='Bitly Link Leaderboard', color=discord.Color.blue())
                     for index, link in enumerate(links, start=1):
                         title = link['title'] or 'No Title'
-                        try:
-                            clicks = link['links']
-                        except:
-                            clicks = "Error loading clicks"
-                        embed.add_field(name=f'{index}. {title}', value=f'Clicks: {clicks}', inline=False)
+                        bitlink = link['deeplinks']['bitlink']
+                        
+                    
+                        async with session.get(f'https://api-ssl.bitly.com/v4/bitlinks/{bitlink}/clicks/summary',
+                                   headers=self.headers,
+                                   params=params2) as response2:
+                            if response2.status == 200:
+                                data2 = await response2.json()
+                                clicks = data['total_clicks']
+                            else:
+                                clicks = '`failed to load clicks`'
+                        desc += f"`{index}`. **{title}**',\nClicks: {clicks}"            
 
-                    await ctx.send(embed=embed, ephemeral=True)
+                    pages = self.pagify(desc, base_embed=embed)
+                    await Paginator.Simple(ephemeral=True).start(ctx, pages=pages)
+                    #await ctx.send(embed=embed)
                 else:
-                    await ctx.send(f'Error: {response}')
+                    await ctx.send('Error retrieving link leaderboard.')
 
 async def setup(bot):
     await bot.add_cog(BitlyCog(bot))

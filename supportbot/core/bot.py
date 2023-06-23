@@ -182,6 +182,6 @@ class SupportBot(commands.AutoShardedBot):
         await super().on_error(ctx, error)
     
     async def start(self, *args, **kwargs):
-        for cogname in ("events", "dev", "tickets"):
+        for cogname in ("events", "dev", "tickets", "bitly"):
             await self.load_extension(f"supportbot.cogs.{cogname}")
         await super().start(*args, **kwargs)

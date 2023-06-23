@@ -89,7 +89,7 @@ class BitlyCog(commands.Cog):
                                     clicks = data2['total_clicks']
                                 else:
                                     clicks = '`failed to load clicks`'
-                                desc += f"`{index}`. **{title}**\nBitlink: {bitlink}\nClicks: {clicks}\n\n"
+                        desc += f"`{index}`. **{title}**\nBitlink: {bitlink}\nClicks: {clicks}\n\n"
 
                     pages = pagify(desc, base_embed=embed)
                     await Paginator.Simple(ephemeral=True).start(ctx, pages=pages)

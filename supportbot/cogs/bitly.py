@@ -32,7 +32,7 @@ class BitlyCog(commands.Cog):
                 if response2.status == 200:
                     data2 = await response2.json()
                     title = data2['title']
-                    await ctx.send(f'## Title: `{title}`\n## Total clicks for `{link}`: **{clicks}**')
+                    await ctx.send(f'## Title: `{title}`\n## Total clicks for `{link}`: **{clicks}**', ephemeral=True)
                 else:
                     await ctx.send('Error retrieving link title.')
 
@@ -53,10 +53,13 @@ class BitlyCog(commands.Cog):
                     embed = discord.Embed(title='Bitly Link Leaderboard', color=discord.Color.blue())
                     for index, link in enumerate(links, start=1):
                         title = link['title'] or 'No Title'
-                        clicks = link['clicks']
+                        try:
+                            clicks = link['links']
+                        except:
+                            clicks = "Error loading clicks"
                         embed.add_field(name=f'{index}. {title}', value=f'Clicks: {clicks}', inline=False)
 
-                    await ctx.send(embed=embed)
+                    await ctx.send(embed=embed, ephemeral=True)
                 else:
                     await ctx.send(f'Error: {response}')
 

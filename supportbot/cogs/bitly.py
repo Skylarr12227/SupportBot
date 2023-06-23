@@ -11,6 +11,8 @@ class BitlyCog(commands.Cog):
             'Content-Type': 'application/json',
         }
 
+    @app_commands.default_permissions(manage_messages=True)
+    @app_commands.checks.has_permissions(manage_messages=True)
     @app_commands.command()
     async def link_metrics(self, interaction, link: str):
         """Individual link metrics for WOMBO affiliate links"""
@@ -36,7 +38,8 @@ class BitlyCog(commands.Cog):
                 else:
                     await ctx.send('Error retrieving link title.')
 
-
+    @app_commands.default_permissions(manage_messages=True)
+    @app_commands.checks.has_permissions(manage_messages=True)
     @app_commands.command()
     async def affiliate_board(self, interaction):
         """Affiliate leaderboard for WOMBO"""

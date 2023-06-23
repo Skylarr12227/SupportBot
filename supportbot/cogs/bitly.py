@@ -46,6 +46,25 @@ class BitlyCog(commands.Cog):
         ctx = await self.bot.get_context(interaction)
         params = {'size': '10'}
         params2 = {'units': '-1'}
+        def pagify(text: str, *, per_page: int = 15, sep: str = "\n", base_embed=None):
+            page = ""
+            pages = []
+            raw = text.strip().split(sep)
+            total_pages = ((len(raw) - 1) // per_page) + 1
+            for idx, part in enumerate(raw):
+                page += part + sep
+                if idx % per_page == per_page - 1 or idx == len(raw) - 1:
+                    # Strip out the last sep
+                    page = page[: -len(sep)]
+                    if base_embed is not None:
+                        embed = base_embed.copy()
+                        embed.description = page
+                        embed.set_footer(text=f"Page {(idx // per_page) + 1}/{total_pages}")
+                        pages.append(embed)
+                    else:
+                        pages.append(page)
+                    page = ""
+            return pages
         async with aiohttp.ClientSession() as session:
             async with session.get('https://api-ssl.bitly.com/v4/groups/BmbemxsY7AC/bitlinks',
                                    headers=self.headers,
@@ -59,20 +78,19 @@ class BitlyCog(commands.Cog):
                         title = link['title'] or 'No Title'
                         deeplinks = link['deeplinks']
                         bitlinks = [dl['bitlink'] for dl in deeplinks]
-    
+
                         for bitlink in bitlinks:
                             async with session.get(f'https://api-ssl.bitly.com/v4/bitlinks/{bitlink}/clicks/summary',
-                                                   headers=self.headers,
-                                                   params=params2) as response2:
+                                    headers=self.headers,
+                                    params=params2) as response2:
                                 if response2.status == 200:
                                     data2 = await response2.json()
                                     clicks = data2['total_clicks']
                                 else:
                                     clicks = '`failed to load clicks`'
-    
                                 desc += f"`{index}`. **{title}**\nBitlink: {bitlink}\nClicks: {clicks}\n\n"
-    
-                    pages = self.pagify(desc, base_embed=embed)
+
+                    pages = pagify(desc, base_embed=embed)
                     await Paginator.Simple(ephemeral=True).start(ctx, pages=pages)
                 else:
                     await ctx.send('Error retrieving link leaderboard.')

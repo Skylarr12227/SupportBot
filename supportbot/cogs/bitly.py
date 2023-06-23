@@ -58,7 +58,7 @@ class BitlyCog(commands.Cog):
 
                     await ctx.send(embed=embed)
                 else:
-                    await ctx.send('Error retrieving link leaderboard.')
+                    await ctx.send(f'Error: {response}')
 
 async def setup(bot):
     await bot.add_cog(BitlyCog(bot))

@@ -43,7 +43,7 @@ class BitlyCog(commands.Cog):
         ctx = await self.bot.get_context(interaction)
         params = {'size': '10'}
         async with aiohttp.ClientSession() as session:
-            async with session.get('https://api-ssl.bitly.com/v4/groups/default/bitlinks',
+            async with session.get('https://api-ssl.bitly.com/v4/groups/BmbemxsY7AC/bitlinks',
                                    headers=self.headers,
                                    params=params) as response:
                 if response.status == 200:

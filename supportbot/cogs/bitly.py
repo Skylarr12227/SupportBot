@@ -120,8 +120,16 @@ class BitlyCog(commands.Cog):
                     data = await response.json()
                     bitlink = data['link']
                     await ctx.send(f'Bitly link created: {bitlink}', ephemeral=True)
+                elif response.status == 400:
+                    await ctx.send('Invalid URL. Please check the URL and try again.', ephemeral=True)
+                elif response.status == 401:
+                    await ctx.send('Invalid Bitly API key. Please check the API key and try again.', ephemeral=True)
+                elif response.status == 429:
+                    await ctx.send('Rate limit exceeded. Please try again later.', ephemeral=True)
                 else:
-                    await ctx.send('Error creating Bitly link.')
+                    data = await response.json()
+                    formatted_data = '\n'.join(f'{k}: {v}' for k, v in data.items())
+                    await ctx.send(f'Error creating Bitly link. {formatted_data}')
 
 async def setup(bot):
     await bot.add_cog(BitlyCog(bot))

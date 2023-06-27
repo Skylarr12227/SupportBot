@@ -82,7 +82,7 @@ class BitlyCog(commands.Cog):
                     embed = discord.Embed(title='Bitly Link Leaderboard', color=discord.Color.blue())
                     for index, link in enumerate(links, start=1):
                         title = link['title'] or 'No Title'
-                        bitlink = link['deeplinks']['bitlink']
+                        bitlink = link['id']
                         
                     
                         async with session.get(f'https://api-ssl.bitly.com/v4/bitlinks/{bitlink}/clicks/summary',

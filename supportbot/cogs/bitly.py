@@ -101,16 +101,16 @@ class BitlyCog(commands.Cog):
                 else:
                     await ctx.send('Error retrieving link leaderboard.')
 
-
     @support()
     @app_commands.command()
-    async def create_bitly(self, interaction, url: str):
+    async def create_bitly(self, interaction, url: str, title: str):
         """Create a Bitly link"""
         ctx = await self.bot.get_context(interaction)
         data = {
             'group_guid': 'BmbemxsY7AC',
             'domain': 'wombo.com',
-            'long_url': url
+            'long_url': url,
+            'title': title
         }
         async with aiohttp.ClientSession() as session:
             async with session.post('https://api-ssl.bitly.com/v4/shorten',
@@ -121,7 +121,7 @@ class BitlyCog(commands.Cog):
                     bitlink = data['link']
                     await ctx.send(f'Bitly link created: {bitlink}', ephemeral=True)
                 elif response.status == 400:
-                    await ctx.send('Invalid URL. Please check the URL and try again.', ephemeral=True)
+                    await ctx.send('Invalid URL or title. Please check the URL and title and try again.', ephemeral=True)
                 elif response.status == 401:
                     await ctx.send('Invalid Bitly API key. Please check the API key and try again.', ephemeral=True)
                 elif response.status == 429:

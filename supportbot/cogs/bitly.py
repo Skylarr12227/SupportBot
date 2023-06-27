@@ -113,7 +113,7 @@ class BitlyCog(commands.Cog):
             'title': title
         }
         async with aiohttp.ClientSession() as session:
-            async with session.post('https://api-ssl.bitly.com/v4/shorten',
+            async with session.post('https://api-ssl.bitly.com/v4/bitlinks',
                                     headers=self.headers,
                                     json=data) as response:
                 if response.status == 200:

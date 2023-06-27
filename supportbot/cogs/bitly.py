@@ -108,6 +108,8 @@ class BitlyCog(commands.Cog):
         """Create a Bitly link"""
         ctx = await self.bot.get_context(interaction)
         data = {
+            'group_guid': 'BmbemxsY7AC',
+            'domain': 'wombo.com',
             'long_url': url
         }
         async with aiohttp.ClientSession() as session:

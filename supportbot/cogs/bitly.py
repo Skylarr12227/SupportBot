@@ -3,6 +3,8 @@ import discord
 from discord.ext import commands
 from discord import app_commands
 import Paginator
+from supportbot.core.utils import team, support
+
 
 class BitlyCog(commands.Cog):
     def __init__(self, bot):
@@ -12,6 +14,9 @@ class BitlyCog(commands.Cog):
             'Content-Type': 'application/json',
         }
 
+
+
+    
     @app_commands.default_permissions(manage_messages=True)
     @app_commands.checks.has_permissions(manage_messages=True)
     @app_commands.command()
@@ -39,14 +44,33 @@ class BitlyCog(commands.Cog):
                 else:
                     await ctx.send('Error retrieving link title.')
 
-    @app_commands.default_permissions(manage_messages=True)
-    @app_commands.checks.has_permissions(manage_messages=True)
+    @support()
     @app_commands.command()
     async def affiliate_board(self, interaction):
         """Affiliate leaderboard for WOMBO"""
         ctx = await self.bot.get_context(interaction)
         params = {'size': '10'}
         params2 = {'units': '-1'}
+        def pagify(text: str, *, per_page: int = 15, sep: str = "\n", base_embed=None):
+            page = ""
+            pages = []
+            raw = text.strip().split(sep)
+            total_pages = ((len(raw) - 1) // per_page) + 1
+            for idx, part in enumerate(raw):
+                page += part + sep
+                if idx % per_page == per_page - 1 or idx == len(raw) - 1:
+                    # Strip out the last sep
+                    page = page[: -len(sep)]
+                    if base_embed is not None:
+                        embed = base_embed.copy()
+                        embed.description = page
+                        embed.set_footer(text=f"Page {(idx // per_page) + 1}/{total_pages}")
+                        pages.append(embed)
+                    else:
+                        pages.append(page)
+                    page = ""
+            return pages
+
         async with aiohttp.ClientSession() as session:
             async with session.get('https://api-ssl.bitly.com/v4/groups/BmbemxsY7AC/bitlinks',
                                    headers=self.headers,
@@ -58,21 +82,44 @@ class BitlyCog(commands.Cog):
                     embed = discord.Embed(title='Bitly Link Leaderboard', color=discord.Color.blue())
                     for index, link in enumerate(links, start=1):
                         title = link['title'] or 'No Title'
-                        url = link['link']
-                        async with session.get(f'https://api-ssl.bitly.com/v4/bitlinks/{url}/clicks/summary',
-                                               headers=self.headers,
-                                               params=params2) as response2:
+                        bitlink = link['deeplinks']['bitlink']
+                        
+                    
+                        async with session.get(f'https://api-ssl.bitly.com/v4/bitlinks/{bitlink}/clicks/summary',
+                                   headers=self.headers,
+                                   params=params2) as response2:
                             if response2.status == 200:
                                 data2 = await response2.json()
-                                clicks = data2['total_clicks']
+                                clicks = data['total_clicks']
                             else:
-                                clicks = 'Failed to load clicks'
-                        desc += f"`{index}`. **{title}**\nBitlink: {url}\nTotal Clicks: {clicks}\n\n"
-    
-                    embed.description = desc
-                    await ctx.send(embed=embed)
+                                clicks = '`failed to load clicks`'
+                        desc += f"`{index}`. **{title}**',\nClicks: {clicks}"            
+
+                    pages = pagify(desc, base_embed=embed)
+                    await Paginator.Simple(ephemeral=True).start(ctx, pages=pages)
+                    #await ctx.send(embed=embed)
                 else:
-                    await ctx.send('Error retrieving link leaderboard.'))
+                    await ctx.send('Error retrieving link leaderboard.')
+
+
+    @support()
+    @app_commands.command()
+    async def create_bitly(self, interaction, url: str):
+        """Create a Bitly link"""
+        ctx = await self.bot.get_context(interaction)
+        data = {
+            'long_url': url
+        }
+        async with aiohttp.ClientSession() as session:
+            async with session.post('https://api-ssl.bitly.com/v4/shorten',
+                                    headers=self.headers,
+                                    json=data) as response:
+                if response.status == 200:
+                    data = await response.json()
+                    bitlink = data['link']
+                    await ctx.send(f'Bitly link created: {bitlink}', ephemeral=True)
+                else:
+                    await ctx.send('Error creating Bitly link.')
 
 async def setup(bot):
     await bot.add_cog(BitlyCog(bot))

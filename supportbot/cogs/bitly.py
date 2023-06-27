@@ -129,7 +129,7 @@ class BitlyCog(commands.Cog):
                 else:
                     data = await response.json()
                     formatted_data = '\n'.join(f'{k}: {v}' for k, v in data.items())
-                    await ctx.send(f'Error creating Bitly link. {formatted_data}')
+                    await ctx.send(response)
 
 async def setup(bot):
     await bot.add_cog(BitlyCog(bot))

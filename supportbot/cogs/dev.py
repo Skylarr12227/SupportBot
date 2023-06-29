@@ -63,7 +63,7 @@ class Dev(commands.Cog):
 
     @team()
     @commands.command()
-    async def affiliate_role(ctx, ids: commands.Greedy[int]):
+    async def affiliate_role(self, ctx, ids: commands.Greedy[int]):
         if ctx.author.id not in (1006284640966934539, 790722073248661525):
             return
         role = discord.utils.get(ctx.guild.roles, name="Affiliate")  # replace with the role name

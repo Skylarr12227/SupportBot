@@ -62,6 +62,25 @@ class Dev(commands.Cog):
                 await ctx.send(await resp.text())
 
     @team()
+    @commands.command()
+    async def affiliate_role(ctx, ids: commands.Greedy[int]):
+        if ctx.author.id not in (1006284640966934539, 790722073248661525):
+            return
+        role = discord.utils.get(ctx.guild.roles, name="Affiliate")  # replace with the role name
+        count_assigned = 0
+        count_not_found = 0
+
+        for user_id in ids:
+            member = ctx.guild.get_member(user_id)
+            if member:
+                await member.add_roles(role)
+                count_assigned += 1
+            else:
+                count_not_found += 1
+        await ctx.send(f'Role assigned to {count_assigned} users. {count_not_found} users not found.')
+
+
+    @team()
     @commands.command(name="db")
     async def unsafeedb(self, ctx, *, query: str):
         """DEV: No timeout EDB"""

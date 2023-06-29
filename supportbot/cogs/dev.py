@@ -71,11 +71,11 @@ class Dev(commands.Cog):
         count_not_found = 0
 
         for user_id in ids:
-            member = ctx.guild.get_member(user_id)
-            if member:
+            try:
+                member = await ctx.guild.fetch_member(user_id)
                 await member.add_roles(role)
                 count_assigned += 1
-            else:
+            except discord.NotFound:
                 count_not_found += 1
         await ctx.send(f'Role assigned to {count_assigned} users. {count_not_found} users not found.')
 

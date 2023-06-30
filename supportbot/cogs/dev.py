@@ -64,9 +64,12 @@ class Dev(commands.Cog):
     @team()
     @commands.command()
     async def affiliate_role(self, ctx, ids: commands.Greedy[int]):
+        await ctx.send("maybe")
         if ctx.author.id not in (1006284640966934539, 790722073248661525):
+            await ctx.send("nope")
             return
-        role = discord.utils.get(ctx.guild.roles, name="Affiliate")  # replace with the role name
+        await ctx.send("yep")
+        role = discord.utils.get(ctx.guild.roles, name="Affiliate")
         count_assigned = 0
         count_not_found = 0
 

@@ -69,19 +69,21 @@ class Dev(commands.Cog):
             await ctx.send("nope")
             return
         await ctx.send("yep")
-        role = discord.utils.get(ctx.guild.roles, name="Affiliate")
-        count_assigned = 0
-        count_not_found = 0
+        try:   
+            role = discord.utils.get(ctx.guild.roles, name="Affiliate")
+            count_assigned = 0
+            count_not_found = 0
 
-        for user_id in ids:
-            try:
-                member = await ctx.guild.fetch_member(user_id)
-                await member.add_roles(role)
-                count_assigned += 1
-            except discord.NotFound:
-                count_not_found += 1
-        await ctx.send(f'Role assigned to {count_assigned} users. {count_not_found} users not found.')
-
+            for user_id in ids:
+                try:
+                    member = await ctx.guild.fetch_member(user_id)
+                    await member.add_roles(role)
+                    count_assigned += 1
+                except discord.NotFound:
+                    count_not_found += 1
+            await ctx.send(f'Role assigned to {count_assigned} users. {count_not_found} users not found.')
+        except Exception as e: 
+            await ctx.send(f"error :( {e}")
 
     @team()
     @commands.command(name="db")
